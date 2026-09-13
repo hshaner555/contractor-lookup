@@ -74,7 +74,7 @@ typeCheckingMode = "basic"
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "api/tests", "importers/tests", "lib/tests"]
-pythonpath = ["api/src", "importers/src", "lib/src"]
+pythonpath = ["api/src", "importers/src", "importers", "lib/src"]
 addopts = "-ra"
 
 [tool.ruff.lint.isort]

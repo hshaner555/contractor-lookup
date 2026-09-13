@@ -53,4 +53,9 @@ uv run ruff check .
 uv run ruff format --check .
 uv run pyright
 uv run pytest
+uv run pytest --cov=contractor_lib --cov=contractor_api --cov=contractor_importers --cov=importers --cov-report=term-missing
 ```
+
+Unit tests are separated by package in `lib/tests`, `api/tests`, and
+`importers/tests`. The external-source browser and database integration paths
+are covered separately from these unit tests.
