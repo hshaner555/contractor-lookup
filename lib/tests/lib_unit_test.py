@@ -26,9 +26,9 @@ def test_normalizers_handle_empty_and_unicode_values() -> None:
 
 
 def test_database_url_uses_environment(monkeypatch) -> None:
-    monkeypatch.setenv("DATABASE_URL", "mysql+pymysql://example/db")
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://example/db")
 
-    assert database_url() == "mysql+pymysql://example/db"
+    assert database_url() == "postgresql+psycopg://example/db"
 
 
 class FakeResult:
@@ -41,6 +41,9 @@ class FakeResult:
 
     def first(self):
         return self.row
+
+    def scalar_one(self):
+        return self.lastrowid
 
 
 class FakeConnection:

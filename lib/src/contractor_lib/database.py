@@ -9,7 +9,7 @@ from sqlalchemy.engine import Engine
 def database_url() -> str:
     return os.environ.get(
         "DATABASE_URL",
-        "mysql+pymysql://contractor:contractor@localhost:3306/contractors",
+        "postgresql+psycopg://contractor:contractor@localhost:5432/contractors",
     )
 
 
