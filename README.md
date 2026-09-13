@@ -54,8 +54,10 @@ uv run ruff format --check .
 uv run pyright
 uv run pytest
 uv run pytest --cov=contractor_lib --cov=contractor_api --cov=contractor_importers --cov=importers --cov-report=term-missing
+./scripts/check_coverage.sh
 ```
 
 Unit tests are separated by package in `lib/tests`, `api/tests`, and
-`importers/tests`. The external-source browser and database integration paths
-are covered separately from these unit tests.
+`importers/tests`. The coverage gate enforces minimums of 90% for `lib`, 90%
+for `api`, and 45% for `importers`. The external-source browser and database
+integration paths are covered separately from these unit tests.
