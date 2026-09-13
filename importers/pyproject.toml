@@ -1,0 +1,30 @@
+[project]
+name = "importers"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "shared-lib",
+    "pdfplumber>=0.11.0",
+    "playwright>=1.40.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    "openpyxl>=3.1.0",
+]
+
+# Map your scripts to executable commands
+[project.scripts]
+contractor-import-csv = "contractor_importers.cli:csv_main"
+contractor-import-bexley = "contractor_importers.cli:bexley_main"
+contractor-import-columbus = "contractor_importers.cli:columbus_main"
+contractor-import-franklin = "contractor_importers.cli:franklin_main"
+contractor-import-ohio = "contractor_importers.cli:ohio_main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+shared-lib = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/contractor_importers"]

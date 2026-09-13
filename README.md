@@ -1,26 +1,53 @@
 # contractor-lookup
 
-The contractor lookup site
+Contractor licensing lookup with a FastAPI service, independently runnable
+source importers, shared Python domain code, and a MySQL database.
 
-# Development
+## Development
 
-## Initial Setup
+This application uses Python 3.12 and uv. From the root directory, run:
 
-This application uses python3.12. You must create a virtualenv with:
-
-```
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-dev.txt
+```bash
+uv sync --dev
 ```
 
-You must also install the `pre-commit` hooks with `pre-commit install` after
-creating the virtualenv.
+Install the pre-commit hooks with `pre-commit install` after creating the
+environment.
 
-## Testing / Linting / Formatting
+## Running the API
 
-Testing is done by running `pytest`.
+```bash
+uv run --package api uvicorn contractor_api.main:app --reload
+```
 
-Linting is done by running `pyright <tbd>` and `ruff --check . --fix`.
+Set `DATABASE_URL` when running against MySQL. The default points to a local
+database named `contractors`.
 
-Formatting is done by running `ruff --format`.
+## Running an importer
+
+```bash
+uv run --package importers contractor-import-csv importers/sample_import.csv
+```
+
+The source-specific adapters are retained under `importers/` and are being
+connected to their external-source CLIs incrementally.
+
+## Running with Compose
+
+```bash
+docker compose up --build db api
+docker compose --profile importers run --rm importers
+```
+
+The database schema is initialized from `db/init.sql`. The API waits for the
+MySQL health check before starting. The importer service mounts the sample
+input file and runs the CSV importer by default.
+
+## Testing, linting, and type checking
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run pyright
+uv run pytest
+```

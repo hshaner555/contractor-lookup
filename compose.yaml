@@ -1,0 +1,44 @@
+services:
+  db:
+    build: ./db
+    environment:
+      MYSQL_DATABASE: contractors
+      MYSQL_USER: contractor
+      MYSQL_PASSWORD: contractor
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ucontractor", "-pcontractor"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      DATABASE_URL: mysql+pymysql://contractor:contractor@db:3306/contractors
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  importers:
+    build:
+      context: .
+      dockerfile: importers/Dockerfile
+    environment:
+      DATABASE_URL: mysql+pymysql://contractor:contractor@db:3306/contractors
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["importers"]
+    volumes:
+      - ./importers:/data/importers:ro
+    command: ["/data/importers/sample_import.csv"]
+
+volumes:
+  mysql-data:

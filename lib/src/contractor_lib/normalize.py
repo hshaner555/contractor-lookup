@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import unicodedata
 
@@ -22,8 +24,7 @@ def _clean(value: str | None) -> str:
         return ""
     value = unicodedata.normalize("NFKD", value)
     value = value.encode("ascii", "ignore").decode("ascii")
-    value = value.lower()
-    value = value.replace("&", " and ")
+    value = value.lower().replace("&", " and ")
     value = re.sub(r"[^a-z0-9]+", " ", value)
     return re.sub(r"\s+", " ", value).strip()
 
@@ -44,6 +45,4 @@ def normalize_business(value: str | None) -> str:
 
 
 def normalize_credential(value: str | None) -> str:
-    if not value:
-        return ""
-    return re.sub(r"[^A-Z0-9]", "", value.upper())
+    return re.sub(r"[^A-Z0-9]", "", value.upper()) if value else ""
