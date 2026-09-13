@@ -1,0 +1,4 @@
+business_name,person_name,credential_number,credential_type,credential_kind,issuing_authority,jurisdiction,status,expiration_date,source_url,source_record_number,last_verified
+Example Mechanical LLC,Jordan Example,HV.12345,HVAC,LICENSE,Ohio Construction Industry Licensing Board (OCILB),State of Ohio,Active,2026-12-31,,,2026-09-03
+Example Mechanical LLC,Jordan Example,REG-4567,HVAC Contractor Registration,REGISTRATION,Franklin County Ohio,Franklin County Ohio,Active,2026-12-31,,,2026-09-03
+Example Mechanical LLC,Jordan Example,COL-98765,HVAC Contractor Registration,REGISTRATION,City of Columbus,Columbus Ohio,Active,2026-12-31,,,2026-09-03
