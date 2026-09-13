@@ -2,14 +2,13 @@ services:
   db:
     build: ./db
     environment:
-      MYSQL_DATABASE: contractors
-      MYSQL_USER: contractor
-      MYSQL_PASSWORD: contractor
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: contractors
+      POSTGRES_USER: contractor
+      POSTGRES_PASSWORD: contractor
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ucontractor", "-pcontractor"]
+      test: ["CMD-SHELL", "pg_isready -U contractor -d contractors"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -19,7 +18,7 @@ services:
       context: .
       dockerfile: api/Dockerfile
     environment:
-      DATABASE_URL: mysql+pymysql://contractor:contractor@db:3306/contractors
+      DATABASE_URL: postgresql+psycopg://contractor:contractor@db:5432/contractors
     ports:
       - "8000:8000"
     depends_on:
@@ -31,7 +30,7 @@ services:
       context: .
       dockerfile: importers/Dockerfile
     environment:
-      DATABASE_URL: mysql+pymysql://contractor:contractor@db:3306/contractors
+      DATABASE_URL: postgresql+psycopg://contractor:contractor@db:5432/contractors
     depends_on:
       db:
         condition: service_healthy
@@ -41,4 +40,4 @@ services:
     command: ["contractor-import-csv", "/data/importers/sample_import.csv"]
 
 volumes:
-  mysql-data:
+  postgres-data:

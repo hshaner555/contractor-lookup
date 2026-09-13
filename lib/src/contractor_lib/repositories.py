@@ -67,6 +67,7 @@ def upsert_record(connection: Connection, record: CredentialRecord) -> dict[str,
                 INSERT INTO contractors
                     (business_name, normalized_business_name, person_name, normalized_person_name)
                 VALUES (:business_name, :normalized_business, :person_name, :normalized_person)
+                RETURNING id
             """),
             {
                 "business_name": record.business_name,
@@ -74,7 +75,7 @@ def upsert_record(connection: Connection, record: CredentialRecord) -> dict[str,
                 "person_name": record.person_name,
                 "normalized_person": normalized_person,
             },
-        ).lastrowid
+        ).scalar_one()
         match_reason = "new"
     else:
         contractor_id = contractor["id"]
@@ -89,6 +90,7 @@ def upsert_record(connection: Connection, record: CredentialRecord) -> dict[str,
             VALUES (:contractor_id, :credential_number, :credential_type, :credential_kind,
                     :issuing_authority, :jurisdiction, :status, :expiration_date,
                     :source_url, :source_record_number, :last_verified)
+                RETURNING id
         """),
         {
             **record.as_dict(),
@@ -99,6 +101,6 @@ def upsert_record(connection: Connection, record: CredentialRecord) -> dict[str,
     return {
         "action": "inserted",
         "contractor_id": contractor_id,
-        "credential_id": result.lastrowid,
+        "credential_id": result.scalar_one(),
         "match_reason": match_reason,
     }

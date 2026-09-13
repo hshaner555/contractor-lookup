@@ -1,7 +1,7 @@
 # contractor-lookup
 
 Contractor licensing lookup with a FastAPI service, independently runnable
-source importers, shared Python domain code, and a MySQL database.
+source importers, shared Python domain code, and a PostgreSQL database.
 
 ## Development
 
@@ -20,7 +20,7 @@ environment.
 uv run --package api uvicorn contractor_api.main:app --reload
 ```
 
-Set `DATABASE_URL` when running against MySQL. The default points to a local
+Set `DATABASE_URL` when running against PostgreSQL. The default points to a local
 database named `contractors`.
 
 ## Running an importer
@@ -33,7 +33,7 @@ The source-specific adapters are connected to the independent
 `contractor-import-bexley`, `contractor-import-columbus`,
 `contractor-import-franklin`, and `contractor-import-ohio` commands. Each
 command accepts a local source file or source query arguments and writes
-through the shared MySQL persistence layer.
+through the shared PostgreSQL persistence layer.
 
 ## Running with Compose
 
@@ -43,7 +43,7 @@ docker compose --profile importers run --rm importers
 ```
 
 The database schema is initialized from `db/init.sql`. The API waits for the
-MySQL health check before starting. The importer service mounts the sample
+PostgreSQL health check before starting. The importer service mounts the sample
 input file and runs the CSV importer by default.
 
 ## Testing, linting, and type checking
