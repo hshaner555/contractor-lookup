@@ -1,0 +1,6 @@
+-r requirements.txt
+pre-commit
+pyright
+pytest
+pytest-coverage
+ruff
