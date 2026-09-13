@@ -24,8 +24,8 @@ import asyncio
 import re
 from datetime import datetime, timezone
 
-from ingest import upsert_record
-from models import CredentialRecord
+from contractor_importers.persistence import upsert_record
+from contractor_lib.models import CredentialRecord
 
 AUTHORITY = "Franklin County, Ohio"
 JURISDICTION = "Franklin County, Ohio"
@@ -120,9 +120,7 @@ def normalize_search_row(row: dict, selected_type: str | None = None):
     Detail-page enrichment can later fill business/registrant/registration
     number when the result page only shows an application number.
     """
-    number = _value(
-        row, "license number", "registration number", "application number", "number"
-    )
+    number = _value(row, "license number", "registration number", "application number", "number")
     ctype = _value(row, "type") or selected_type or "Contractor Registration"
     person = _value(row, "primary contractor", "contractor", "applicant", "contact")
     business = _value(row, "business", "company")
@@ -160,9 +158,7 @@ async def search(
             if select is None:
                 raise RuntimeError("Could not locate SmartGov Type selector")
             options = await select.locator("option").all_text_contents()
-            match = next(
-                (x for x in options if type_text.lower() in (x or "").lower()), None
-            )
+            match = next((x for x in options if type_text.lower() in (x or "").lower()), None)
             if not match:
                 raise ValueError(f"Type not found: {type_text}. Available: {options}")
             await select.select_option(label=match)
@@ -173,9 +169,7 @@ async def search(
                 raise RuntimeError("Could not locate Primary Contractor field")
             await field.fill(primary_contractor)
 
-        await page.get_by_role(
-            "button", name=re.compile("^Search$", re.IGNORECASE)
-        ).click()
+        await page.get_by_role("button", name=re.compile("^Search$", re.IGNORECASE)).click()
         await page.wait_for_load_state("networkidle")
         await page.wait_for_timeout(delay_ms)
 
@@ -192,15 +186,13 @@ async def ingest_search(
     primary_contractor: str | None = None,
     headless: bool = True,
 ):
-    rows = await search(
-        type_text=type_text, primary_contractor=primary_contractor, headless=headless
-    )
+    rows = await search(type_text=type_text, primary_contractor=primary_contractor, headless=headless)
     out = {"rows": len(rows), "inserted": 0, "updated": 0}
     for row in rows:
         rec = normalize_search_row(row, selected_type=type_text)
         if not (rec.credential_number or rec.business_name or rec.person_name):
             continue
-        action = upsert_record(rec)["action"]
+        action = str(upsert_record(rec)["action"])
         out[action] += 1
     return out
 

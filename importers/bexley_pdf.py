@@ -9,11 +9,13 @@ This importer accepts a LOCAL PDF path so the ingestion job can download the
 official file first, archive it, and then parse it deterministically.
 """
 
+from __future__ import annotations
+
 from datetime import datetime, timezone
 
 import pdfplumber
-from ingest import upsert_record
-from models import CredentialRecord
+from contractor_importers.persistence import upsert_record
+from contractor_lib.models import CredentialRecord
 
 AUTHORITY = "City of Bexley"
 JURISDICTION = "Bexley, Ohio"
@@ -44,13 +46,10 @@ def parse_pdf(pdf_path: str, source_url: str | None = None):
                 if "credential_type" not in mapped or "business_name" not in mapped:
                     continue
                 for row in table[1:]:
-                    data = {}
+                    data: dict[str, str | None] = {}
                     for key, value in zip(mapped, row):
                         if key:
-                            data[key] = (
-                                " ".join((value or "").replace("\n", " ").split())
-                                or None
-                            )
+                            data[key] = " ".join((value or "").replace("\n", " ").split()) or None
                     if not data.get("business_name"):
                         continue
                     records.append(
@@ -76,5 +75,5 @@ def ingest_pdf(pdf_path: str, source_url: str | None = None):
     for rec in parse_pdf(pdf_path, source_url):
         out["records"] += 1
         result = upsert_record(rec)
-        out[result["action"]] += 1
+        out[str(result["action"])] += 1
     return out

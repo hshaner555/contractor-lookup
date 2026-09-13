@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class CredentialRecord:
     business_name: str | None
     person_name: str | None
@@ -16,5 +18,5 @@ class CredentialRecord:
     source_record_number: str | None = None
     last_verified: str | None = None
 
-    def dict(self):
+    def as_dict(self) -> dict[str, str | None]:
         return asdict(self)

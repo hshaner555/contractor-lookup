@@ -28,8 +28,8 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
-from ingest import upsert_record
-from models import CredentialRecord
+from contractor_importers.persistence import upsert_record
+from contractor_lib.models import CredentialRecord
 from openpyxl import load_workbook
 
 AUTHORITY = "Ohio Construction Industry Licensing Board (OCILB)"
@@ -107,6 +107,8 @@ def parse_roster_file(path: str):
     if suffix == ".xlsx":
         wb = load_workbook(p, read_only=True, data_only=True)
         ws = wb.active
+        if ws is None:
+            raise ValueError("Ohio roster workbook has no active worksheet")
         values = ws.iter_rows(values_only=True)
         headers = [str(x or "") for x in next(values)]
         rows = [dict(zip(headers, row)) for row in values]
@@ -129,7 +131,7 @@ def ingest_roster_file(path: str):
     result = {"records": 0, "inserted": 0, "updated": 0}
     for rec in parse_roster_file(path):
         result["records"] += 1
-        action = upsert_record(rec)["action"]
+        action = str(upsert_record(rec)["action"])
         result[action] += 1
     return result
 
@@ -151,16 +153,10 @@ def parse_detail_html(html: str, source_url: str | None = None):
         rows = table.find_all("tr")
         if not rows:
             continue
-        headers = [
-            _norm_header(x.get_text(" ", strip=True))
-            for x in rows[0].find_all(["th", "td"])
-        ]
+        headers = [_norm_header(x.get_text(" ", strip=True)) for x in rows[0].find_all(["th", "td"])]
         if "name" in headers and ("company" in headers or "public address" in headers):
             if len(rows) > 1:
-                vals = [
-                    _clean(x.get_text(" ", strip=True))
-                    for x in rows[1].find_all(["th", "td"])
-                ]
+                vals = [_clean(x.get_text(" ", strip=True)) for x in rows[1].find_all(["th", "td"])]
                 row = dict(zip(headers, vals))
                 person_name = row.get("name")
             break
@@ -170,17 +166,12 @@ def parse_detail_html(html: str, source_url: str | None = None):
         rows = table.find_all("tr")
         if not rows:
             continue
-        headers = [
-            _norm_header(x.get_text(" ", strip=True))
-            for x in rows[0].find_all(["th", "td"])
-        ]
+        headers = [_norm_header(x.get_text(" ", strip=True)) for x in rows[0].find_all(["th", "td"])]
         if "credential" not in headers or "license type" not in headers:
             continue
 
         for tr in rows[1:]:
-            vals = [
-                _clean(x.get_text(" ", strip=True)) for x in tr.find_all(["th", "td"])
-            ]
+            vals = [_clean(x.get_text(" ", strip=True)) for x in tr.find_all(["th", "td"])]
             if not vals:
                 continue
             row = dict(zip(headers, vals))
@@ -206,9 +197,7 @@ def parse_detail_html(html: str, source_url: str | None = None):
     return records
 
 
-def fetch_detail(
-    contact: str | int, cred: str | int, session: requests.Session | None = None
-):
+def fetch_detail(contact: str | int, cred: str | int, session: requests.Session | None = None):
     session = session or requests.Session()
     params = {"contact": str(contact), "cred": str(cred)}
     r = session.get(DETAIL_URL, params=params, timeout=30)
@@ -216,12 +205,10 @@ def fetch_detail(
     return parse_detail_html(r.text, source_url=r.url)
 
 
-def ingest_detail(
-    contact: str | int, cred: str | int, session: requests.Session | None = None
-):
+def ingest_detail(contact: str | int, cred: str | int, session: requests.Session | None = None):
     out = {"records": 0, "inserted": 0, "updated": 0}
     for rec in fetch_detail(contact, cred, session=session):
         out["records"] += 1
-        action = upsert_record(rec)["action"]
+        action = str(upsert_record(rec)["action"])
         out[action] += 1
     return out

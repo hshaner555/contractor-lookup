@@ -1,0 +1,20 @@
+[project]
+name = "api"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "shared-lib",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Tells the frontend to fetch 'shared-lib' from the local workspace
+[tool.uv.sources]
+shared-lib = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/contractor_api"]
