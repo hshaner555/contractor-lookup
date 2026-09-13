@@ -107,6 +107,8 @@ def parse_roster_file(path: str):
     if suffix == ".xlsx":
         wb = load_workbook(p, read_only=True, data_only=True)
         ws = wb.active
+        if ws is None:
+            raise ValueError("Ohio roster workbook has no active worksheet")
         values = ws.iter_rows(values_only=True)
         headers = [str(x or "") for x in next(values)]
         rows = [dict(zip(headers, row)) for row in values]
@@ -129,7 +131,7 @@ def ingest_roster_file(path: str):
     result = {"records": 0, "inserted": 0, "updated": 0}
     for rec in parse_roster_file(path):
         result["records"] += 1
-        action = upsert_record(rec)["action"]
+        action = str(upsert_record(rec)["action"])
         result[action] += 1
     return result
 
@@ -207,6 +209,6 @@ def ingest_detail(contact: str | int, cred: str | int, session: requests.Session
     out = {"records": 0, "inserted": 0, "updated": 0}
     for rec in fetch_detail(contact, cred, session=session):
         out["records"] += 1
-        action = upsert_record(rec)["action"]
+        action = str(upsert_record(rec)["action"])
         out[action] += 1
     return out

@@ -66,9 +66,9 @@ line-length = 120
 select = ["E", "F", "I"]
 
 [tool.pyright]
-include = ["api/src", "importers/src", "lib/src", "tests"]
+include = ["api/src", "importers/src", "importers/*.py", "lib/src", "tests"]
 exclude = ["**/__pycache__", ".venv"]
-extraPaths = ["api/src", "importers/src", "lib/src"]
+extraPaths = ["api/src", "importers/src", "importers", "lib/src"]
 pythonVersion = "3.12"
 typeCheckingMode = "basic"
 

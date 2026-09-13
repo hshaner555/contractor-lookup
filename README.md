@@ -29,8 +29,11 @@ database named `contractors`.
 uv run --package importers contractor-import-csv importers/sample_import.csv
 ```
 
-The source-specific adapters are retained under `importers/` and are being
-connected to their external-source CLIs incrementally.
+The source-specific adapters are connected to the independent
+`contractor-import-bexley`, `contractor-import-columbus`,
+`contractor-import-franklin`, and `contractor-import-ohio` commands. Each
+command accepts a local source file or source query arguments and writes
+through the shared MySQL persistence layer.
 
 ## Running with Compose
 

@@ -46,7 +46,7 @@ def parse_pdf(pdf_path: str, source_url: str | None = None):
                 if "credential_type" not in mapped or "business_name" not in mapped:
                     continue
                 for row in table[1:]:
-                    data = {}
+                    data: dict[str, str | None] = {}
                     for key, value in zip(mapped, row):
                         if key:
                             data[key] = " ".join((value or "").replace("\n", " ").split()) or None
@@ -75,5 +75,5 @@ def ingest_pdf(pdf_path: str, source_url: str | None = None):
     for rec in parse_pdf(pdf_path, source_url):
         out["records"] += 1
         result = upsert_record(rec)
-        out[result["action"]] += 1
+        out[str(result["action"])] += 1
     return out

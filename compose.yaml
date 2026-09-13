@@ -38,7 +38,7 @@ services:
     profiles: ["importers"]
     volumes:
       - ./importers:/data/importers:ro
-    command: ["/data/importers/sample_import.csv"]
+    command: ["contractor-import-csv", "/data/importers/sample_import.csv"]
 
 volumes:
   mysql-data:

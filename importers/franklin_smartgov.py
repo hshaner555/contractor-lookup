@@ -192,7 +192,7 @@ async def ingest_search(
         rec = normalize_search_row(row, selected_type=type_text)
         if not (rec.credential_number or rec.business_name or rec.person_name):
             continue
-        action = upsert_record(rec)["action"]
+        action = str(upsert_record(rec)["action"])
         out[action] += 1
     return out
 
