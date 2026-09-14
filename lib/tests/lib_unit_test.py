@@ -26,6 +26,12 @@ def test_normalizers_handle_empty_and_unicode_values() -> None:
 
 
 def test_database_url_uses_environment(monkeypatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql://example/db")
+
+    assert database_url() == "postgresql+psycopg://example/db"
+
+
+def test_database_url_preserves_psycopg_scheme(monkeypatch) -> None:
     monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://example/db")
 
     assert database_url() == "postgresql+psycopg://example/db"

@@ -11,7 +11,7 @@ app = FastAPI(title="Construction Credential Lookup", version="0.1.0")
 engine = create_database_engine()
 
 
-@app.get("/health")
+@app.get("/healthz")
 def health() -> dict[str, bool]:
     with engine.connect() as connection:
         connection.execute(text("SELECT 1"))
