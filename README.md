@@ -5,7 +5,20 @@ source importers, shared Python domain code, and a PostgreSQL database.
 
 ## Development
 
-This application uses Python 3.12 and uv. From the root directory, run:
+This application uses Python 3.12, uv, Docker Compose, GitHub CLI, and the
+Render CLI. On Ubuntu, the repository includes a one-time bootstrap script:
+
+```bash
+./scripts/initial_setup.sh
+```
+
+The script installs missing tools through Snap, adds your user to the Docker
+group, and installs the Render CLI. It may prompt for your sudo password. Log
+out and back in after it finishes so the Docker group membership takes effect.
+The script is safe to run again; already-installed tools and group membership
+are left unchanged.
+
+After setup, from the repository root, install the project dependencies:
 
 ```bash
 uv sync --dev
